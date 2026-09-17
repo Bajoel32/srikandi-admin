@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// Admin hub di-deploy sebagai Render Static Site (root path).
+// Panel admin booking, di-deploy ke Vercel sebagai SPA (root path).
 export default defineConfig({
   base: '/',
   plugins: [react()],

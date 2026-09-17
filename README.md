@@ -1,47 +1,58 @@
-# Srikandi — Admin Hub
+# Srikandi — Admin Booking
 
-App terpisah untuk mengelola data web Srikandi dan memantau kondisi backend.
-Frontend statis (React + Vite), berbicara ke backend `srikandi-api` (folder `server/`
-di repo utama) lewat `/api/admin/*`.
+Panel admin Toko Srikandi untuk mengelola booking pelanggan. Frontend statis
+(React + Vite) yang berbicara langsung ke Supabase (`bookings`, `admin_users`)
+lewat `@supabase/supabase-js`, tanpa backend perantara.
 
 ## Fitur
 
-| Halaman | Fungsi |
-|---|---|
-| **Dashboard** | Indikator sistem, AI/chatbot, konten, aktivitas, keamanan. Auto-refresh 15 detik. |
-| **Layanan** | CRUD jenis layanan (dipakai storefront + tool `infoLayanan`). |
-| **Galeri** | CRUD item katalog (dipakai halaman Galeri + tool `rekomendasiGaleri`). |
-| **Knowledge Base** | CRUD potongan pengetahuan untuk RAG chatbot. |
-| **Pengaturan RAG** | Atur `topK` & `minScore` retriever. |
-| **Booking** | Lihat form "Buat Janji" yang masuk + ubah status. |
-| **Pesanan** | Ubah status & progres pesanan yang dilihat konsumen. |
-| **Konsumen** | Daftar konsumen (baca-saja, tanpa kata sandi). |
-| **Log Chatbot** | Transkrip ringkas + penanda eskalasi. |
+- Login tanpa kata sandi: tautan masuk dikirim ke email admin yang terdaftar
+  di tabel `admin_users`.
+- Daftar booking berbentuk kartu, dengan tab status (Baru, Diproses, Selesai,
+  Dibatalkan, Semua) dan pencarian berdasarkan nama/nomor HP.
+- Detail booking: ubah status (alur Baru → Diproses/Dibatalkan → Selesai/Buka
+  Kembali), edit perkiraan tanggal, jumlah, dan cara bayar.
+- Tombol "Hubungi via WhatsApp" dengan nomor & pesan yang sudah disiapkan.
+- Data diperbarui otomatis tiap 60 detik dan saat tab kembali aktif.
+
+Navigasi menyisakan tempat untuk modul lain (Pesanan, Galeri, Konsultasi) yang
+akan ditambah setelah RLS admin untuk tabel-tabel itu tersedia.
 
 ## Jalankan lokal
 
 ```bash
 npm install
-cp .env.example .env.local        # set VITE_API_BASE=http://localhost:8787
-npm run dev                       # http://localhost:5174
+cp .env.example .env.local   # isi VITE_SUPABASE_URL & VITE_SUPABASE_ANON_KEY
+npm run dev                  # http://localhost:5174
 ```
 
-Backend harus jalan lebih dulu (`cd ../SRIKANDI/server && npm run dev`) dengan
-`ADMIN_USERNAME` + `ADMIN_PASSWORD_HASH` terisi di `server/.env`.
-Buat hash: `cd server && npm run admin:hash -- "kata-sandi-anda"`.
+Email yang login harus terdaftar dan aktif di tabel `admin_users`, kalau
+tidak akan ditolak dengan pesan "Akun ini tidak terdaftar sebagai admin".
 
-Pastikan origin hub ada di allowlist backend: set `ADMIN_ORIGINS=http://localhost:5174`
-di `server/.env`.
+## Test
 
-## Deploy (Render Static Site)
+```bash
+npm run test
+```
 
-1. Push repo ini ke GitHub (`srikandi-admin`).
-2. Render → New → Blueprint → pilih repo. `render.yaml` sudah disiapkan.
-3. Isi env `VITE_API_BASE` = URL service `srikandi-api` (mis. `https://srikandi-api.onrender.com`).
-4. Di backend Render, tambahkan URL hasil deploy hub ini ke env `ADMIN_ORIGINS`.
+## Deploy (Vercel)
 
-## Auth
+1. Push repo ini ke GitHub, lalu import ke Vercel.
+2. Isi env `VITE_SUPABASE_URL` dan `VITE_SUPABASE_ANON_KEY` di Project
+   Settings → Environment Variables.
+3. Di Supabase → Authentication → URL Configuration: set Site URL ke domain
+   Vercel, tambahkan domain Vercel dan `http://localhost:5174` ke Redirect
+   URLs.
+4. Matikan "Allow new users to sign up" di Supabase Authentication settings.
+5. Undang admin lewat Supabase → Authentication → Users → Invite user, lalu
+   tambahkan baris terkait di tabel `admin_users` (`aktif = true`).
 
-Token sesi admin dari `POST /api/admin/login` disimpan di `sessionStorage`
-(hilang saat tab ditutup) dan dikirim sebagai `Authorization: Bearer`.
-TTL default 12 jam (`ADMIN_SESSION_TTL` di backend).
+## Auth & data
+
+- Login pakai `signInWithOtp` (magic link), sesi tersimpan di browser lewat
+  Supabase (`persistSession: true`).
+- Semua akses data mengandalkan RLS di Supabase: admin hanya bisa membaca
+  booking jika terdaftar aktif di `admin_users`, dan hanya boleh mengubah
+  kolom `status`, `estimated_date`, `quantity`, `preferred_payment`.
+- Tidak ada fitur tambah/hapus booking — form booking publik ditangani oleh
+  Edge Function di repo lain.
