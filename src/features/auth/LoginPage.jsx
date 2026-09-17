@@ -5,9 +5,7 @@ function friendlyError() {
   return 'Gagal mengirim tautan masuk. Periksa email Anda lalu coba lagi.';
 }
 
-// Login khusus untuk modul Booking (Supabase), terpisah dari login utama
-// admin hub (username/password ke backend lama).
-export default function BookingLoginCard() {
+export default function LoginPage() {
   const { requestLoginLink, notAdminMessage } = useAuth();
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
@@ -29,15 +27,11 @@ export default function BookingLoginCard() {
   };
 
   return (
-    <div className="booking-page">
-      <div className="page-head">
-        <div>
-          <h1>Booking</h1>
-          <div className="sub">Masuk dengan email admin untuk mengelola booking.</div>
-        </div>
-      </div>
+    <div className="login-wrap">
+      <div className="card pad login-card">
+        <h1>Srikandi Admin</h1>
+        <p>Kelola booking pelanggan Toko Srikandi.</p>
 
-      <div className="card pad booking-login-card">
         {notAdminMessage && <div className="banner err">{notAdminMessage}</div>}
         {err && <div className="banner err">{err}</div>}
 
@@ -45,16 +39,14 @@ export default function BookingLoginCard() {
           <div className="banner ok">
             Tautan masuk sudah dikirim ke <strong>{email}</strong>. Buka email Anda dan
             ketuk tautannya untuk masuk.
-            <div>
-              <button
-                type="button"
-                className="btn sm"
-                style={{ marginTop: 12 }}
-                onClick={() => setSent(false)}
-              >
-                Kirim ulang
-              </button>
-            </div>
+            <button
+              type="button"
+              className="btn sm"
+              style={{ marginTop: 12 }}
+              onClick={() => setSent(false)}
+            >
+              Kirim ulang
+            </button>
           </div>
         ) : (
           <form onSubmit={submit}>
@@ -74,7 +66,7 @@ export default function BookingLoginCard() {
               {busy ? 'Mengirim…' : 'Kirim Tautan Masuk'}
             </button>
             <p className="muted" style={{ fontSize: 13, marginTop: 14 }}>
-              Tidak perlu kata sandi. Login ini terpisah dari login admin hub utama.
+              Tidak perlu kata sandi. Kami akan mengirim tautan masuk ke email Anda.
             </p>
           </form>
         )}
