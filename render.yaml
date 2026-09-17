@@ -1,0 +1,20 @@
+# Blueprint Render untuk admin hub (Static Site).
+# Render Dashboard -> New -> Blueprint -> pilih repo srikandi-admin.
+services:
+  - type: web
+    name: srikandi-admin
+    runtime: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    pullRequestPreviewsEnabled: false
+    envVars:
+      - key: VITE_API_BASE      # URL backend, mis. https://srikandi-api.onrender.com
+        sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /*
+        name: X-Robots-Tag
+        value: noindex, nofollow

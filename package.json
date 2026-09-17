@@ -1,0 +1,20 @@
+{
+  "name": "srikandi-admin",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Admin hub untuk web Srikandi — kelola data, RAG, dan pantau indikator sistem.",
+  "scripts": {
+    "dev": "vite --port 5174",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.0.4",
+    "vite": "^8.2.0"
+  }
+}
