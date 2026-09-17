@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Panel admin Toko Srikandi untuk mengelola booking pelanggan.",
+  "description": "Admin hub untuk web Srikandi — kelola data, RAG, booking, dan pantau indikator sistem.",
   "scripts": {
     "dev": "vite --port 5174",
     "build": "vite build",

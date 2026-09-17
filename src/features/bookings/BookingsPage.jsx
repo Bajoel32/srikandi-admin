@@ -6,6 +6,7 @@ import SearchBox from './components/SearchBox.jsx';
 import BookingCard from './components/BookingCard.jsx';
 import BookingDetailModal from './components/BookingDetailModal.jsx';
 import { formatRelativeTime } from './utils/format.js';
+import { useAuth } from '../auth/AuthProvider.jsx';
 
 function matchesSearch(booking, term) {
   if (!term) return true;
@@ -18,6 +19,7 @@ function matchesSearch(booking, term) {
 
 export default function BookingsPage() {
   const { status, items, lastUpdated, reload, applyLocalUpdate } = useBookings();
+  const { admin, logout } = useAuth();
   const [tab, setTab] = useState('Baru');
   const [search, setSearch] = useState('');
   const [openId, setOpenId] = useState(null);
@@ -40,17 +42,23 @@ export default function BookingsPage() {
   const openBooking = items.find((b) => b.id === openId) || null;
 
   return (
-    <div>
+    <div className="booking-page">
       <div className="page-head">
         <div>
           <h1>Booking</h1>
           <div className="sub">
             {lastUpdated ? `Diperbarui ${formatRelativeTime(lastUpdated)}` : 'Memuat…'}
+            {admin?.nama ? ` · ${admin.nama}` : ''}
           </div>
         </div>
-        <button type="button" className="btn" onClick={reload}>
-          ↻ Muat ulang
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button type="button" className="btn" onClick={reload}>
+            ↻ Muat ulang
+          </button>
+          <button type="button" className="btn sm" onClick={logout}>
+            Keluar Booking
+          </button>
+        </div>
       </div>
 
       <SearchBox value={search} onChange={setSearch} />
